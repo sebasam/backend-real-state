@@ -1,0 +1,14 @@
+# Visual Studio files
+.vs/
+*/.[Vv][Ss]/
+*.[Vv][Ss]/
+*.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.sln.iml
+*.userprefs
+*.ionide/
+[Bb]in/
+[Oo]bj/
