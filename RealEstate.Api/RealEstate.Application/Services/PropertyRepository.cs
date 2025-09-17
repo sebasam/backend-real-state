@@ -34,7 +34,12 @@ public class PropertyRepository : IPropertyRepository
         if (filter.MaxPrice.HasValue)
             mongoFilter &= Builders<Property>.Filter.Lte(x => x.Price, filter.MaxPrice.Value);
 
-        var properties = await _properties.Find(mongoFilter).ToListAsync();
+        var skip = (filter.Page - 1) * filter.PageSize;
+
+        var properties = await _properties.Find(mongoFilter)
+            .Skip(skip)
+            .Limit(filter.PageSize)
+            .ToListAsync();
 
         var result = new List<PropertyWithImageDto>();
         foreach (var prop in properties)
@@ -57,6 +62,7 @@ public class PropertyRepository : IPropertyRepository
 
         return result;
     }
+
 
     public Task<Property?> GetByIdAsync(string id)
         => _properties.Find(x => x.Id == id).FirstOrDefaultAsync();

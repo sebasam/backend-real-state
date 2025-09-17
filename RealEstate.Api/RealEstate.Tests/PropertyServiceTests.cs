@@ -81,6 +81,44 @@ public class PropertyServiceTests
         Assert.That(result[0].ImageUrl, Is.EqualTo("file.jpg"));
     }
 
+    [Test]
+    public async Task GetByIdAsync_ShouldReturnPropertyWithImageAndOwner()
+    {
+        var propertyId = "p1";
+        var property = new Property
+        {
+            Id = propertyId,
+            Name = "Casa",
+            Address = "Calle 1",
+            Price = 100,
+            OwnerId = "o1"
+        };
+
+        _repoMock.Setup(r => r.GetByIdAsync(propertyId))
+                 .ReturnsAsync(property);
+
+        var image = new PropertyImage { PropertyId = propertyId, File = "file.jpg", Enabled = true };
+        var owner = new Owner { Id = "o1", Name = "Juan" };
+
+        var cursorImages = MockCursor(new List<PropertyImage> { image });
+        _imagesMock.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<PropertyImage>>(),
+                                           It.IsAny<FindOptions<PropertyImage, PropertyImage>>(),
+                                           default))
+                   .ReturnsAsync(cursorImages);
+
+        var cursorOwners = MockCursor(new List<Owner> { owner });
+        _ownersMock.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<Owner>>(),
+                                           It.IsAny<FindOptions<Owner, Owner>>(),
+                                           default))
+                   .ReturnsAsync(cursorOwners);
+
+        var result = await _service.GetByIdAsync(propertyId);
+
+        Assert.That(result!.Id, Is.EqualTo(propertyId));
+        Assert.That(result.OwnerName, Is.EqualTo("Juan"));
+        Assert.That(result.ImageUrl, Is.EqualTo("file.jpg"));
+    }
+
     private static IAsyncCursor<T> MockCursor<T>(List<T> items)
     {
         var cursor = new Mock<IAsyncCursor<T>>();

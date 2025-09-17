@@ -53,4 +53,29 @@ public class PropertyService : IPropertyService
         return result;
     }
 
+    public async Task<PropertyWithImageDto?> GetByIdAsync(string id)
+    {
+        var property = await _repo.GetByIdAsync(id);
+        if (property == null) return null;
+
+        var image = await _imagesCollection
+            .Find(img => img.PropertyId == property.Id && img.Enabled)
+            .FirstOrDefaultAsync();
+
+        var owner = await _ownersCollection
+            .Find(o => o.Id == property.OwnerId)
+            .FirstOrDefaultAsync();
+
+        return new PropertyWithImageDto
+        {
+            Id = property.Id,
+            Name = property.Name,
+            Address = property.Address,
+            Price = property.Price,
+            OwnerId = property.OwnerId,
+            OwnerName = owner?.Name,
+            ImageUrl = image?.File
+        };
+    }
+
 }
