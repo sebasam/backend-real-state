@@ -1,12 +1,30 @@
-﻿namespace RealEstate.Domain.Entities;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-public class Property
+namespace RealEstate.Domain.Entities
 {
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Address { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public string CodeInternal { get; set; } = string.Empty;
-    public int Year { get; set; }
-    public string IdOwner { get; set; } = string.Empty;
+    public class Property
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = null!;
+
+        [BsonElement("name")]
+        public string Name { get; set; } = null!;
+
+        [BsonElement("address")]
+        public string Address { get; set; } = null!;
+
+        [BsonElement("price")]
+        public decimal Price { get; set; }
+
+        [BsonElement("codeInternal")]
+        public string CodeInternal { get; set; } = null!;
+
+        [BsonElement("year")]
+        public int Year { get; set; }
+
+        [BsonElement("ownerId")]
+        public string OwnerId { get; set; } = null!;
+    }
 }

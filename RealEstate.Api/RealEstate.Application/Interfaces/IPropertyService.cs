@@ -1,4 +1,6 @@
-﻿public interface IPropertyService
+﻿using RealEstate.Application.Dtos;
+
+public interface IPropertyService
 {
-    Task<List<PropertyDto>> GetFiltered(string? name, string? address, decimal? minPrice, decimal? maxPrice);
+    Task<List<PropertyWithImageDto>> GetFiltered(string? name, string? address, decimal? minPrice, decimal? maxPrice);
 }

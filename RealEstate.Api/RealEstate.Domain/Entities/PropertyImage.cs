@@ -1,9 +1,21 @@
-﻿namespace RealEstate.Domain.Entities;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-public class PropertyImage
+namespace RealEstate.Domain.Entities
 {
-    public string Id { get; set; } = string.Empty;
-    public string IdProperty { get; set; } = string.Empty;
-    public string File { get; set; } = string.Empty;
-    public bool Enabled { get; set; }
+    public class PropertyImage
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = null!;
+
+        [BsonElement("propertyId")]
+        public string PropertyId { get; set; } = null!;
+
+        [BsonElement("file")]
+        public string File { get; set; } = null!;
+
+        [BsonElement("enabled")]
+        public bool Enabled { get; set; }
+    }
 }
