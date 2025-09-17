@@ -2,9 +2,8 @@
 using RealEstate.Domain.Entities;
 using RealEstate.Infrastructure.Mongo;
 using RealEstate.Application.Interfaces;
-using MongoDB.Bson;
-using MongoDB.Driver.Linq;
 using RealEstate.Application.Dtos;
+using RealEstate.Application.DTOs;
 
 public class PropertyRepository : IPropertyRepository
 {
@@ -17,32 +16,32 @@ public class PropertyRepository : IPropertyRepository
         _images = ctx.GetCollection<PropertyImage>("PropertyImages");
     }
 
-    public async Task<List<PropertyWithImageDto>> GetAllAsync(
-        string? name, string? address, decimal? minPrice, decimal? maxPrice)
+    public async Task<List<PropertyWithImageDto>> GetAllAsync(PropertyFilterDto filter)
     {
-        // Filtros básicos
-        var filter = Builders<Property>.Filter.Empty;
+        var mongoFilter = Builders<Property>.Filter.Empty;
 
-        if (!string.IsNullOrWhiteSpace(name))
-            filter &= Builders<Property>.Filter.Regex(x => x.Name, new MongoDB.Bson.BsonRegularExpression(name, "i"));
+        if (!string.IsNullOrWhiteSpace(filter.Name))
+            mongoFilter &= Builders<Property>.Filter.Regex(
+                x => x.Name, new MongoDB.Bson.BsonRegularExpression(filter.Name, "i"));
 
-        if (!string.IsNullOrWhiteSpace(address))
-            filter &= Builders<Property>.Filter.Regex(x => x.Address, new MongoDB.Bson.BsonRegularExpression(address, "i"));
+        if (!string.IsNullOrWhiteSpace(filter.Address))
+            mongoFilter &= Builders<Property>.Filter.Regex(
+                x => x.Address, new MongoDB.Bson.BsonRegularExpression(filter.Address, "i"));
 
-        if (minPrice.HasValue)
-            filter &= Builders<Property>.Filter.Gte(x => x.Price, minPrice.Value);
+        if (filter.MinPrice.HasValue)
+            mongoFilter &= Builders<Property>.Filter.Gte(x => x.Price, filter.MinPrice.Value);
 
-        if (maxPrice.HasValue)
-            filter &= Builders<Property>.Filter.Lte(x => x.Price, maxPrice.Value);
+        if (filter.MaxPrice.HasValue)
+            mongoFilter &= Builders<Property>.Filter.Lte(x => x.Price, filter.MaxPrice.Value);
 
-        var properties = await _properties.Find(filter).ToListAsync();
+        var properties = await _properties.Find(mongoFilter).ToListAsync();
 
         var result = new List<PropertyWithImageDto>();
         foreach (var prop in properties)
         {
             var image = await _images
                 .Find(x => x.PropertyId == prop.Id && x.Enabled)
-                .SortBy(x => x.Id) 
+                .SortBy(x => x.Id)
                 .FirstOrDefaultAsync();
 
             result.Add(new PropertyWithImageDto

@@ -2,6 +2,7 @@
 using RealEstate.Application.Interfaces;
 using RealEstate.Domain.Entities;
 using MongoDB.Driver;
+using RealEstate.Application.DTOs;
 
 public class PropertyService : IPropertyService
 {
@@ -19,10 +20,9 @@ public class PropertyService : IPropertyService
         _ownersCollection = ownersCollection;
     }
 
-    public async Task<List<PropertyWithImageDto>> GetFiltered(
-        string? name, string? address, decimal? minPrice, decimal? maxPrice)
+    public async Task<List<PropertyWithImageDto>> GetFiltered(PropertyFilterDto filter)
     {
-        var props = await _repo.GetAllAsync(name, address, minPrice, maxPrice);
+        var props = await _repo.GetAllAsync(filter);
 
         if (!props.Any())
             return new List<PropertyWithImageDto>();
@@ -33,29 +33,24 @@ public class PropertyService : IPropertyService
             .Find(img => propertyIds.Contains(img.PropertyId) && img.Enabled)
             .ToListAsync();
 
-        // 👇 Obtener todos los owners involucrados
         var ownerIds = props.Select(p => p.OwnerId).Distinct().ToList();
+
         var owners = await _ownersCollection
             .Find(o => ownerIds.Contains(o.Id))
             .ToListAsync();
 
-        var ownerMap = owners.ToDictionary(o => o.Id, o => o.Name);
-
-        var result = props.Select(p =>
+        var result = props.Select(p => new PropertyWithImageDto
         {
-            var img = images.FirstOrDefault(i => i.PropertyId == p.Id);
-            return new PropertyWithImageDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Address = p.Address,
-                Price = p.Price,
-                OwnerId = p.OwnerId,
-                OwnerName = ownerMap.ContainsKey(p.OwnerId) ? ownerMap[p.OwnerId] : "Desconocido",
-                ImageUrl = img?.File ?? ""
-            };
+            Id = p.Id,
+            Name = p.Name,
+            Address = p.Address,
+            Price = p.Price,
+            OwnerId = p.OwnerId,
+            ImageUrl = images.FirstOrDefault(i => i.PropertyId == p.Id)?.File,
+            OwnerName = owners.FirstOrDefault(o => o.Id == p.OwnerId)?.Name
         }).ToList();
 
         return result;
     }
+
 }
