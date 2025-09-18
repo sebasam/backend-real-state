@@ -10,7 +10,6 @@ Repositorio: [https://github.com/sebasam/backend-real-state](https://github.com/
 
 - .NET 9 (C#)
 - MongoDB
-- Heroku
 - Swagger (documentación de API)
 - Arquitectura limpia
 - Inyección de dependencias
@@ -20,8 +19,7 @@ Repositorio: [https://github.com/sebasam/backend-real-state](https://github.com/
 ## ⚡ Endpoints principales
 
 - `/api/property`
-- `/api/owner`
-- `/api/image`
+- `/api/property/:id`
 
 ---
 
@@ -56,7 +54,7 @@ dotnet run --project RealEstate.Api
 ```
 
 La API estará disponible en:  
-🔗 [https://localhost:7174](https://localhost:7174)
+🔗 [https://localhost:5187](https://localhost:5187)
 
 ---
 
@@ -67,7 +65,7 @@ La API estará disponible en:
 Una vez levantado, entra a:
 
 ```
-https://localhost:7174/swagger
+https://localhost:5187/swagger
 ```
 
 para ver la documentación generada automáticamente con Swagger.
