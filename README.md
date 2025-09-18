@@ -60,17 +60,6 @@ La API estará disponible en:
 
 ---
 
-## 🚀 Despliegue en Heroku
-
-```bash
-heroku login
-heroku container:login
-heroku create <nombre-de-tu-app>
-heroku config:set ASPNETCORE_URLS=http://+:5000
-heroku container:push web -a <nombre-de-tu-app>
-heroku container:release web -a <nombre-de-tu-app>
-```
-
 ---
 
 ## 📑 Documentación
